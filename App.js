@@ -3,14 +3,16 @@ import { AppRegistry, StyleSheet, View } from 'react-native'
 
 import { ThemeProvider } from 'react-native-elements'
 
-import { Router } from './app/views/Router.js'
+import Router from './app/views/Router.js'
+import Login from './app/views/Login.js'
+
 
 export default class App extends Component {
   render() {
     return (
       <ThemeProvider theme={theme}>
         <View style={styles.container}>
-          <Router />
+          <Login />
         </View>
       </ThemeProvider>
     )

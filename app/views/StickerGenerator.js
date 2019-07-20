@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
+import { Text } from 'react-native'
 import { Card, Button, Input, Overlay } from 'react-native-elements'
-
-import { sendEmail } from '../services/MailService.js'
 
 export default class StickerGenerator extends Component {
   state = ({
@@ -18,8 +17,8 @@ export default class StickerGenerator extends Component {
   }
 
   fetchCarDetails = (carId) => {
-    let username = 'chrismtest' //this->getUser
-    let url = 'autoground-dev.azurewebsites.net/api/car/id/' + username + '/' + id
+    let username = 'chrismtest'
+    let url = 'autoground-dev.azurewebsites.net/api/car/id/' + username + '/' + carId
 
     return fetch(url, {
       method: 'GET',
@@ -48,8 +47,6 @@ export default class StickerGenerator extends Component {
             title='Generate PNG'
             onPress={() => {
               this.fetchCarDetails('01043ec4-a3ca-4a1f-9a51-a19ede9da920').then((response) => {
-                sendEmail(this.state.userId)
-              }).then((response) => {
                 this.setState({
                   overlayVisible: true
                 })

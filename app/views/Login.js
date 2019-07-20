@@ -35,6 +35,8 @@ export default class Login extends Component {
   }
 
   render () {
+    const { history } = this.props
+
     return (
       <Card title='The Autoground Sticker Generator'>
         <Input 
@@ -53,6 +55,7 @@ export default class Login extends Component {
           title='Log In'
           onPress={() => {
             this.handleLogin()
+            history.push('/generator')
           }}
         />
       </Card>
