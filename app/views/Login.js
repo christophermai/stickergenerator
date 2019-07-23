@@ -8,9 +8,15 @@ export default class Login extends Component {
     accessToken: ''
   }
 
-  handleInput = ({name, value}) => {
+  handleUsernameInput = (value) => {
     this.setState({
-      [name]: value
+      username: value
+    })
+  }
+
+  handlePasswordInput = (value) => {
+    this.setState({
+      password: value
     })
   }
 
@@ -34,7 +40,7 @@ export default class Login extends Component {
     })
   }
 
-  render () {
+  render() {
     const { history } = this.props
 
     return (
@@ -43,13 +49,14 @@ export default class Login extends Component {
           placeholder='Username'
           name='username'
           value={this.state.username}
-          onChange={this.handleInput}
+          onChangeText={this.handleUsernameInput}
         />
         <Input
+          secureTextEntry={true}
           placeholder='Password'
           name='password'
           value={this.state.password}
-          onChange={this.handleInput}
+          onChangeText={this.handlePasswordInput}
         />
         <Button
           title='Log In'
