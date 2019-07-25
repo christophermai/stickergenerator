@@ -44,7 +44,7 @@ export default class Login extends Component {
       this._signInAsync()
     })
   }
-
+  
   _signInAsync = async () => {
     await AsyncStorage.setItem('accessToken', this.state.accessToken)
     await AsyncStorage.setItem('refreshToken', this.state.refreshToken)
