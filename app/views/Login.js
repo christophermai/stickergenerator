@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
-import { Card, Button, Input } from 'react-native-elements'
+import { StyleSheet, View, AsyncStorage } from 'react-native'
+import { Card, Button, Input, ThemeProvider } from 'react-native-elements'
 
 export default class Login extends Component {
   state = {
     username: '',
     password: '',
-    accessToken: ''
+    accessToken: '',
+    refreshToken: ''
   }
 
   handleUsernameInput = (value) => {
@@ -35,37 +37,74 @@ export default class Login extends Component {
       body: JSON.stringify(data)
     }).then(response => response.json()).then((response) => {
       this.setState({
-        accessToken: response.access_token
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token
       })
+    }).then((response) => {
+      this._signInAsync()
     })
+  }
+
+  _signInAsync = async () => {
+    await AsyncStorage.setItem('accessToken', this.state.accessToken)
+    await AsyncStorage.setItem('refreshToken', this.state.refreshToken)
+    this.props.navigation.navigate('StickerGenerator')
   }
 
   render() {
     const { history } = this.props
 
     return (
-      <Card title='The Autoground Sticker Generator'>
-        <Input 
-          placeholder='Username'
-          name='username'
-          value={this.state.username}
-          onChangeText={this.handleUsernameInput}
-        />
-        <Input
-          secureTextEntry={true}
-          placeholder='Password'
-          name='password'
-          value={this.state.password}
-          onChangeText={this.handlePasswordInput}
-        />
-        <Button
-          title='Log In'
-          onPress={() => {
-            this.handleLogin()
-            history.push('/generator')
-          }}
-        />
-      </Card>
+      <ThemeProvider theme={theme}>
+        <View style={styles.container}>
+          <Card title='The Autoground Sticker Generator'>
+            <Input 
+              placeholder='Username'
+              name='username'
+              value={this.state.username}
+              onChangeText={this.handleUsernameInput}
+            />
+            <Input
+              secureTextEntry={true}
+              placeholder='Password'
+              name='password'
+              value={this.state.password}
+              onChangeText={this.handlePasswordInput}
+            />
+            <Button
+              title='Log In'
+              onPress={() => {
+                this.handleLogin()
+                history.push('/generator')
+              }}
+            />
+          </Card>
+        </View>
+      </ThemeProvider>
     )
   }
 }
+
+const theme = {
+  Button: {
+    raised: true,
+  },
+  Card: {
+    titleStyle: {
+      color: '#daa520'
+    }
+  },
+  Input: {
+    containerStyle: {
+      padding: 10,
+    }
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  }
+})

@@ -41,7 +41,7 @@ export default class StickerGenerator extends Component {
           <Input 
             placeholder='Car ID'
             value={this.state.carId}
-            onChange={this.handleInput}
+            onChangeText={this.handleInput}
           />
           <Button
             title='Generate PNG'
