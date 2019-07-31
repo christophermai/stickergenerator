@@ -42,6 +42,8 @@ export default class Login extends Component {
       })
     }).then((response) => {
       this._signInAsync()
+    }).catch((error) => {
+      console.log(error)
     })
   }
   
@@ -52,8 +54,6 @@ export default class Login extends Component {
   }
 
   render() {
-    const { history } = this.props
-
     return (
       <ThemeProvider theme={theme}>
         <View style={styles.container}>
@@ -75,7 +75,6 @@ export default class Login extends Component {
               title='Log In'
               onPress={() => {
                 this.handleLogin()
-                history.push('/generator')
               }}
             />
           </Card>
