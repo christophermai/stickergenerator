@@ -22,14 +22,14 @@ export default class Login extends Component {
     })
   }
 
-  handleLogin = () => {
+  handleLogin = async () => {
     const data = {
       UserId: this.state.username,
       Password: this.state.password,
       RefreshToken: ''
     }
 
-    return fetch('autoground-dev.azurewebsites.net/api/token/login', {
+    return await fetch(loginConfig.dev + '/api/token/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -40,6 +40,7 @@ export default class Login extends Component {
         accessToken: response.access_token,
         refreshToken: response.refresh_token
       })
+      console.log(response.status)
     }).then((response) => {
       this._signInAsync()
     }).catch((error) => {
@@ -82,6 +83,10 @@ export default class Login extends Component {
       </ThemeProvider>
     )
   }
+}
+
+const loginConfig = {
+  dev: 'https:// autoground-dev.azurewebsites.net'
 }
 
 const theme = {

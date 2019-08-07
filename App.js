@@ -22,7 +22,7 @@ const AppNavigator = createSwitchNavigator(
     StickerGenerator:  StickerGenerator
   },
   {
-    initialRouteName: 'StickerGenerator'
+    initialRouteName: 'AuthChecker'
   }
 )
 

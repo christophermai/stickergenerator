@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
+import { Image, StyleSheet, Text, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Overlay, ThemeProvider } from 'react-native-elements'
+
+import mergeImages from 'merge-images'
 
 export default class StickerGenerator extends Component {
   state = ({
     carId: '',
     qrImageUrl: '',
     userId: '',
-    overlayVisible: false
+    overlayVisible: false,
+    imageURI: ''
   })
 
   handleInput = (value) => {
@@ -37,6 +40,13 @@ export default class StickerGenerator extends Component {
     })
   }
 
+  generateSticker = () => {
+    mergeImages([
+      { src: './app/assets/Checkerboard_background.png', x: 0, y: 0 },
+      { src: './app/assets/Logo_Gold.png', x: 50, y: 25 }
+    ]).then(b64 => this.setState({ imageURI: b64 }))
+  }
+
   render () {
     return (
       <ThemeProvider theme={theme}>
@@ -51,8 +61,9 @@ export default class StickerGenerator extends Component {
               title='Generate PNG'
               onPress={() => {
                 this.fetchCarDetails(this.state.carId).then((response) => {
+                  this.generateSticker().then(console.log(this.state.imageURI))
                   this.setState({
-                    overlayVisible: true
+                    overlayVisible: true,
                   })
                 })
               }}
@@ -68,6 +79,7 @@ export default class StickerGenerator extends Component {
           >
             <View>
               <Text>PNG generated and sent as an email.</Text>
+              <Image source={{uri: this.state.imageURI}}></Image>
             </View>
           </Overlay>
         </View>
