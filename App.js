@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { AppRegistry } from 'react-native'
-import { createSwitchNavigator, createAppContainer } from 'react-navigation'
+import { createStackNavigator, createAppContainer } from 'react-navigation'
 
 import Login from './app/views/Login.js'
 import StickerGenerator from './app/views/StickerGenerator.js'
@@ -10,16 +10,24 @@ import AuthChecker from './app/utils/AuthChecker.js'
 class App extends Component {
   render() {
     return (
-      <Login />
+      <Login navigation={this.props.navigation}/>
     )
   }
 }
 
-const AppNavigator = createSwitchNavigator(
+class NavigateStickerGenerator extends Component {
+  render() {
+    return (
+      <StickerGenerator navigation={this.props.navigation}/>
+    )
+  }
+}
+
+const AppNavigator = createStackNavigator(
   {
     AuthChecker: AuthChecker,
     Login: App,
-    StickerGenerator:  StickerGenerator
+    StickerGenerator:  NavigateStickerGenerator
   },
   {
     initialRouteName: 'AuthChecker'
@@ -28,4 +36,4 @@ const AppNavigator = createSwitchNavigator(
 
 export default createAppContainer(AppNavigator)
 
-AppRegistry.registerComponent('App', () => App)
+AppRegistry.registerComponent('AppNavigator', () => AppNavigator)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, ThemeProvider } from 'react-native-elements'
+import { loginConfig } from '../utils/routes.js'
 
 export default class Login extends Component {
   state = {
@@ -40,7 +41,6 @@ export default class Login extends Component {
         accessToken: response.access_token,
         refreshToken: response.refresh_token
       })
-      console.log(response.status)
     }).then((response) => {
       this._signInAsync()
     }).catch((error) => {
@@ -51,6 +51,7 @@ export default class Login extends Component {
   _signInAsync = async () => {
     await AsyncStorage.setItem('accessToken', this.state.accessToken)
     await AsyncStorage.setItem('refreshToken', this.state.refreshToken)
+    await AsyncStorage.setItem('username', this.state.username)
     this.props.navigation.navigate('StickerGenerator')
   }
 
@@ -83,10 +84,6 @@ export default class Login extends Component {
       </ThemeProvider>
     )
   }
-}
-
-const loginConfig = {
-  dev: 'https:// autoground-dev.azurewebsites.net'
 }
 
 const theme = {
