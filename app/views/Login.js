@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, AsyncStorage } from 'react-native'
-import { Card, Button, Input, ThemeProvider } from 'react-native-elements'
+import { StyleSheet, View, AsyncStorage, ActivityIndicator, StatusBar } from 'react-native'
+import { Card, Button, Input, Text, ThemeProvider } from 'react-native-elements'
 import { loginConfig } from '../utils/routes.js'
 
 export default class Login extends Component {
@@ -8,7 +8,10 @@ export default class Login extends Component {
     username: '',
     password: '',
     accessToken: '',
-    refreshToken: ''
+    refreshToken: '',
+    hideError: true,
+    errorMessage: '',
+    loading: false,
   }
 
   handleUsernameInput = (value) => {
@@ -24,6 +27,11 @@ export default class Login extends Component {
   }
 
   handleLogin = async () => {
+    this.setState({
+      loading: true,
+      hideError: true,
+      errorMessage: '',
+    })
     const data = {
       UserId: this.state.username,
       Password: this.state.password,
@@ -43,8 +51,16 @@ export default class Login extends Component {
       })
     }).then((response) => {
       this._signInAsync()
+    }).then((response) => {
+      this.setState({
+        loading: false
+      })
     }).catch((error) => {
-      console.log(error)
+      this.setState({
+        loading: false,
+        hideError: false,
+        errorMessage: 'Invalid credentials'
+      })
     })
   }
   
@@ -56,6 +72,8 @@ export default class Login extends Component {
   }
 
   render() {
+    const { username, password, loading, hideError, errorMessage } = this.state
+
     return (
       <ThemeProvider theme={theme}>
         <View style={styles.container}>
@@ -63,22 +81,31 @@ export default class Login extends Component {
             <Input 
               placeholder='Username'
               name='username'
-              value={this.state.username}
+              value={username}
               onChangeText={this.handleUsernameInput}
             />
             <Input
               secureTextEntry={true}
               placeholder='Password'
               name='password'
-              value={this.state.password}
+              value={password}
               onChangeText={this.handlePasswordInput}
             />
             <Button
-              title='Log In'
+              title={loading ? 'Logging In...' : 'Log In'}
               onPress={() => {
                 this.handleLogin()
               }}
+              disabled={ loading
+                || !username
+                || !password
+              }
             />
+            { !hideError ?
+              <Text style={styles.errorText}>{errorMessage}</Text>
+              :
+              null
+            }
           </Card>
         </View>
       </ThemeProvider>
@@ -107,5 +134,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'center',
+  },
+  errorText: {
+    color: 'red'
   }
 })

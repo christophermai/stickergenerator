@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Text, AsyncStorage } from 'react-native'
-import { Header, Card, Button, Input, ThemeProvider } from 'react-native-elements'
+import { StyleSheet } from 'react-native'
+import { Header } from 'react-native-elements'
 
 import Logout from './Logout.js'
 
