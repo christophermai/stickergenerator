@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, AsyncStorage, ActivityIndicator, StatusBar } from 'react-native'
+import { View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Text, ThemeProvider } from 'react-native-elements'
 import { loginConfig } from '../utils/routes.js'
+
+import styles from './styles.js'
 
 export default class Login extends Component {
   state = {
@@ -128,14 +130,3 @@ const theme = {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  },
-  errorText: {
-    color: 'red'
-  }
-})

@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, Text, View, AsyncStorage } from 'react-native'
+import { Image, Text, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Overlay, ThemeProvider } from 'react-native-elements'
 
 import Navbar from '../components/Navbar.js'
 import { mergeImages } from 'merge-images'
+
+import styles from './styles.js'
 
 export default class StickerGenerator extends Component {
   state = ({
@@ -12,7 +14,10 @@ export default class StickerGenerator extends Component {
     qrImageUrl: '',
     userId: '',
     overlayVisible: false,
-    imageURI: ''
+    imageURI: '',
+    hideError: true,
+    errorMessage: '',
+    loading: false,
   })
 
   componentDidMount() {
@@ -52,6 +57,11 @@ export default class StickerGenerator extends Component {
   }
 
   fetchCarDetails = async (carId) => {
+    this.setState({
+      loading: true,
+      hideError: true,
+      errorMessage: '',
+    })
     const username = this.state.username
     const accessToken = await AsyncStorage.getItem('accessToken');
     let url = 'https://autoground-dev.azurewebsites.net/api/car/id/' + username + '/' + carId
@@ -67,9 +77,17 @@ export default class StickerGenerator extends Component {
         qrImageUrl: response.qrImageUrl,
         userId: response.userId
       })
+    }).then((response) => {
+      this.setState({
+        loading: false
+      })
     }).catch((error) => {
       this.refreshAuth()
-      this.fetchCarDetails(this.state.carId)
+      this.setState({
+        loading: false,
+        hideError: false,
+        errorMessage: 'Invalid carId'
+      })
     })
   }
 
@@ -85,30 +103,40 @@ export default class StickerGenerator extends Component {
   }
 
   render () {
+    const { username, carId, imageURI, overlayVisible, loading, hideError, errorMessage } = this.state
+
     return (
       <ThemeProvider theme={theme}>
-        <Navbar username={this.state.username} />
+        <Navbar username={username} />
         <View style={styles.container}>
           <Card title='The Autoground Sticker Generator'>
             <Input 
               placeholder='Car ID'
-              value={this.state.carId}
+              value={carId}
               onChangeText={this.handleInput}
             />
             <Button
-              title='Generate PNG'
+              title={loading ? 'Generating PNG...' : 'Generate PNG'}
               onPress={() => {
-                this.fetchCarDetails(this.state.carId).then((response) => {
-                  this.generateSticker().then(console.log(this.state.imageURI))
+                this.fetchCarDetails(carId).then((response) => {
+                  this.generateSticker().then(console.log(imageURI))
                   this.setState({
                     overlayVisible: true,
                   })
                 })
               }}
+              disabled={ loading
+                || !carId
+              }
             />
+            { !hideError ?
+              <Text style={styles.errorText}>{errorMessage}</Text>
+              :
+              null
+            }
           </Card>
           <Overlay
-            isVisible={this.state.overlayVisible}
+            isVisible={overlayVisible}
             windowBackgroundColor='rgba(255, 255, 255, .5)'
             overlayBackgroundColor='white'
             width="auto"
@@ -117,7 +145,7 @@ export default class StickerGenerator extends Component {
           >
             <View>
               <Text>PNG generated and sent as an email.</Text>
-              <Image source={{uri: this.state.imageURI}}></Image>
+              <Image source={{uri: imageURI}}></Image>
             </View>
           </Overlay>
         </View>
@@ -141,11 +169,3 @@ const theme = {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  }
-})
