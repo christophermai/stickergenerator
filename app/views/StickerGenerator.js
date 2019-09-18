@@ -3,18 +3,18 @@ import { Image, Text, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Overlay, ThemeProvider } from 'react-native-elements'
 
 import Navbar from '../components/Navbar.js'
-import { mergeImages } from 'merge-images'
+import { emailQRSticker } from '../utils/routes.js'
+import { arrayBufferToBase64 } from '../utils/helpers.js'
 
 import styles from './styles.js'
 
 export default class StickerGenerator extends Component {
   state = ({
+    email: '',
     username: '',
     carId: '',
-    qrImageUrl: '',
-    userId: '',
+    stickerURI: '',
     overlayVisible: false,
-    imageURI: '',
     hideError: true,
     errorMessage: '',
     loading: false,
@@ -29,13 +29,7 @@ export default class StickerGenerator extends Component {
       username: await AsyncStorage.getItem('username')
     })
   }
-
-  handleInput = (value) => {
-    this.setState({
-      carId: value
-    })
-  }
-
+  
   refreshAuth = async () => {
     const username = this.state.username
     const refreshToken = await AsyncStorage.getItem('refreshToken')
@@ -56,15 +50,22 @@ export default class StickerGenerator extends Component {
     }).catch(error => console.log(error))
   }
 
-  fetchCarDetails = async (carId) => {
+  handleInput = (value) => {
+    this.setState({
+      carId: value
+    })
+  }
+
+  emailQRSticker = async (carId) => {
     this.setState({
       loading: true,
       hideError: true,
       errorMessage: '',
     })
-    const username = this.state.username
+    const { username, email } = this.state
+
     const accessToken = await AsyncStorage.getItem('accessToken');
-    let url = 'https://autoground-dev.azurewebsites.net/api/car/id/' + username + '/' + carId
+    let url = emailQRSticker + username + '/' + carId + '/' + email
 
     return fetch(url, {
       method: 'GET',
@@ -72,38 +73,35 @@ export default class StickerGenerator extends Component {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + accessToken
       }
-    }).then(response => response.json()).then((response) => {
+    }).then(response => response.arrayBuffer()).then((buffer) => {
       this.setState({
-        qrImageUrl: response.qrImageUrl,
-        userId: response.userId
-      })
-    }).then((response) => {
-      this.setState({
-        loading: false
+        stickerURI: arrayBufferToBase64(buffer),
+      }, () => {
+        this.setState({
+          loading: false
+        })
       })
     }).catch((error) => {
-      this.refreshAuth()
-      this.setState({
-        loading: false,
-        hideError: false,
-        errorMessage: 'Invalid carId'
-      })
+      if (error.status === '400') {
+        this.setState({
+          loading: false,
+          hideError: false,
+          errorMessage: 'Could not find a car with that ID'
+        })
+      }
+      else {
+        this.refreshAuth()
+        this.setState({
+          loading: false,
+          hideError: false,
+          errorMessage: 'An error occured. Please try again.'
+        })
+      }
     })
   }
 
-  generateSticker = () => {
-    mergeImages([
-      { src: './app/assets/Checkerboard_background.png', x: 0, y: 0 },
-      { src: './app/assets/Logo_Gold.png', x: 50, y: 25 }
-    ]).then((b64) => {
-      this.setState({ imageURI: b64 })
-      console.log('b64: ')
-      console.log(b64)
-    }).catch(error => console.log(error))
-  }
-
   render () {
-    const { username, carId, imageURI, overlayVisible, loading, hideError, errorMessage } = this.state
+    const { username, carId, stickerURI, overlayVisible, loading, hideError, errorMessage } = this.state
 
     return (
       <ThemeProvider theme={theme}>
@@ -118,8 +116,7 @@ export default class StickerGenerator extends Component {
             <Button
               title={loading ? 'Generating PNG...' : 'Generate PNG'}
               onPress={() => {
-                this.fetchCarDetails(carId).then((response) => {
-                  this.generateSticker().then(console.log(imageURI))
+                this.emailQRSticker(carId).then((response) => {
                   this.setState({
                     overlayVisible: true,
                   })
@@ -145,7 +142,17 @@ export default class StickerGenerator extends Component {
           >
             <View>
               <Text>PNG generated and sent as an email.</Text>
-              <Image source={{uri: imageURI}}></Image>
+              <Image
+                style={{
+                  width: 51,
+                  height: 51,
+                  resizeMode: 'contain', //center?
+                }}
+                source={{
+                  uri:
+                    'data:image/png;base64,' + stickerURI,
+                }}
+              />
             </View>
           </Overlay>
         </View>
