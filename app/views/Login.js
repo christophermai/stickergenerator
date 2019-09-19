@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Text, ThemeProvider } from 'react-native-elements'
-import { loginConfig } from '../utils/routes.js'
+import { login } from '../utils/routes.js'
 
 import styles from './styles.js'
 
@@ -28,7 +28,7 @@ export default class Login extends Component {
     })
   }
 
-  handleLogin = async () => {
+  handleLogin = () => {
     this.setState({
       loading: true,
       hideError: true,
@@ -40,20 +40,13 @@ export default class Login extends Component {
       RefreshToken: ''
     }
 
-    return await fetch(loginConfig.dev + '/api/token/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(response => response.json()).then((response) => {
+    return login(data).then(response => response.json()).then((response) => {
       this.setState({
         accessToken: response.access_token,
         refreshToken: response.refresh_token
       })
-    }).then((response) => {
-      this._signInAsync()
-    }).then((response) => {
+    }).then(async () => {
+      await this._signInAsync()
       this.setState({
         loading: false
       })

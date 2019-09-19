@@ -10,3 +10,4 @@ web-build/
 web-report/
 .DS_Store
 app/.DS_Store
+environment.js

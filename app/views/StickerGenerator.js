@@ -3,8 +3,7 @@ import { Image, Text, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Overlay, ThemeProvider } from 'react-native-elements'
 
 import Navbar from '../components/Navbar.js'
-import { emailQRSticker } from '../utils/routes.js'
-import { arrayBufferToBase64 } from '../utils/helpers.js'
+import { refreshToken, emailQRSticker } from '../utils/routes.js'
 
 import styles from './styles.js'
 
@@ -32,19 +31,13 @@ export default class StickerGenerator extends Component {
   
   refreshAuth = async () => {
     const username = this.state.username
-    const refreshToken = await AsyncStorage.getItem('refreshToken')
+    const refreshTok = await AsyncStorage.getItem('refreshToken')
     const refreshData = {
       'UserId': username,
-      'RefreshToken': refreshToken
+      'RefreshToken': refreshTok
     }
 
-    fetch('autoground-dev.azurewebsites.net/api/token/refreshtoken', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(refreshData)
-    }).then(response => response.json()).then((response) => {
+    refreshToken(refreshData).then(response => response.json()).then((response) => {
         AsyncStorage.setItem('accessToken', response.access_token)
         AsyncStorage.setItem('refreshToken', response.refresh_token)
     }).catch(error => console.log(error))
@@ -65,17 +58,10 @@ export default class StickerGenerator extends Component {
     const { username, email } = this.state
 
     const accessToken = await AsyncStorage.getItem('accessToken');
-    let url = emailQRSticker + username + '/' + carId + '/' + email
 
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken
-      }
-    }).then(response => response.arrayBuffer()).then((buffer) => {
+    emailQRSticker(username, carId, email, accessToken).then((response) => {
       this.setState({
-        stickerURI: arrayBufferToBase64(buffer),
+        stickerURI: Buffer.from(response.data, 'binary').toString('base64'),
       }, () => {
         this.setState({
           loading: false
@@ -146,7 +132,7 @@ export default class StickerGenerator extends Component {
                 style={{
                   width: 51,
                   height: 51,
-                  resizeMode: 'contain', //center?
+                  resizeMode: 'contain',
                 }}
                 source={{
                   uri:
