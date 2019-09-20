@@ -1,11 +1,15 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start-dev": "NODE_ENV=dev expo start",
+    "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "build-android-stage": "expo build:android --release-channel staging",
+    "build-ios-stage": "expo build:ios --release-channel staging",
+    "build-android-prod": "expo build:android --release-channel prod",
+    "build-ios-prod": "expo build:ios --release-channel prod"
   },
   "dependencies": {
     "axios": "^0.19.0",
