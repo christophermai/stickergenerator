@@ -9,7 +9,9 @@
     "build-android-stage": "expo build:android --release-channel staging",
     "build-ios-stage": "expo build:ios --release-channel staging",
     "build-android-prod": "expo build:android --release-channel prod",
-    "build-ios-prod": "expo build:ios --release-channel prod"
+    "build-ios-prod": "expo build:ios --release-channel prod",
+    "publish-stage": "expo publish --release-channel staging",
+    "publish-prod": "expo publish --release-channel prod"
   },
   "dependencies": {
     "axios": "^0.19.0",
