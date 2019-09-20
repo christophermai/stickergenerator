@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { AppRegistry } from 'react-native'
-import { createStackNavigator, createAppContainer } from 'react-navigation'
+import { createSwitchNavigator, createAppContainer } from 'react-navigation'
 
 import Login from './app/views/Login.js'
 import StickerGenerator from './app/views/StickerGenerator.js'
@@ -23,7 +23,7 @@ class NavigateStickerGenerator extends Component {
   }
 }
 
-const AppNavigator = createStackNavigator(
+const AppNavigator = createSwitchNavigator(
   {
     AuthChecker: AuthChecker,
     Login: App,

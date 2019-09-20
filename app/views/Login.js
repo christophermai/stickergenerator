@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Text, ThemeProvider } from 'react-native-elements'
 import { login } from '../utils/routes.js'
+import Navbar from '../components/Navbar.js'
 
 import styles from './styles.js'
 
@@ -9,8 +10,6 @@ export default class Login extends Component {
   state = {
     username: '',
     password: '',
-    accessToken: '',
-    refreshToken: '',
     hideError: true,
     errorMessage: '',
     loading: false,
@@ -41,12 +40,7 @@ export default class Login extends Component {
     }
 
     return login(data).then(response => response.json()).then((response) => {
-      this.setState({
-        accessToken: response.access_token,
-        refreshToken: response.refresh_token
-      })
-    }).then(async () => {
-      await this._signInAsync()
+      this._signInAsync(response.access_token, response.refresh_token)
       this.setState({
         loading: false
       })
@@ -59,9 +53,9 @@ export default class Login extends Component {
     })
   }
   
-  _signInAsync = async () => {
-    await AsyncStorage.setItem('accessToken', this.state.accessToken)
-    await AsyncStorage.setItem('refreshToken', this.state.refreshToken)
+  _signInAsync = async (accessToken, refreshToken) => {
+    await AsyncStorage.setItem('accessToken', accessToken)
+    await AsyncStorage.setItem('refreshToken', refreshToken)
     await AsyncStorage.setItem('username', this.state.username)
     this.props.navigation.navigate('StickerGenerator')
   }
@@ -71,6 +65,7 @@ export default class Login extends Component {
 
     return (
       <ThemeProvider theme={theme}>
+        <Navbar username={'Guest'} />
         <View style={styles.container}>
           <Card title='The Autoground Sticker Generator'>
             <Input 

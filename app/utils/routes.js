@@ -1,5 +1,4 @@
 import getEnvVars from '../../environment'
-import axios from 'axios'
 const { theAutoGroundApiUrl } = getEnvVars();
 
 export const login = (data) => {
@@ -21,11 +20,21 @@ export const refreshToken = (refreshData) => {
   })
 }
 
-export const emailQRSticker = (username, carId, email, accessToken) => {
-  return axios.get(`${theAutoGroundApiUrl}/api/car/emailqrsticker/${username}/${carId}/${email}`, {
-    responseType: 'arraybuffer',
+export const getUserData = (username, accessToken) => {
+  return fetch(`${theAutoGroundApiUrl}/api/user/id/${username}`, {
+    method: 'GET',
     headers: {
-      'content-type': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  })
+}
+
+export const emailQRSticker = (username, carId, email, accessToken) => {
+  return fetch(`${theAutoGroundApiUrl}/api/car/emailqrsticker/${username}/${carId}/${email}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + accessToken
     }
   })

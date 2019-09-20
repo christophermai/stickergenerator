@@ -6,12 +6,12 @@ import Logout from './Logout.js'
 
 export default class Navbar extends Component {
   render () {
-    const { username } = this.props
+    const { username, navigation } = this.props
 
     return (
       <Header
         centerComponent={{ text: 'Hello ' + username, style: styles.text }}
-        rightComponent={<Logout />}
+        rightComponent={ username === 'Guest' ? null : <Logout navigation={navigation} />}
         containerStyle={styles.container}>
       </Header>
     )

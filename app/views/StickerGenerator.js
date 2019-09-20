@@ -3,7 +3,7 @@ import { Image, Text, View, AsyncStorage } from 'react-native'
 import { Card, Button, Input, Overlay, ThemeProvider } from 'react-native-elements'
 
 import Navbar from '../components/Navbar.js'
-import { refreshToken, emailQRSticker } from '../utils/routes.js'
+import { refreshToken, emailQRSticker, getUserData } from '../utils/routes.js'
 
 import styles from './styles.js'
 
@@ -24,8 +24,19 @@ export default class StickerGenerator extends Component {
   }
 
   fetchUserData = async () => {
-    this.setState({
-      username: await AsyncStorage.getItem('username')
+    const username = await AsyncStorage.getItem('username')
+    const accessToken = await AsyncStorage.getItem('accessToken')
+
+    getUserData(username, accessToken).then((response) => response.json()).then((response) => {
+      this.setState({
+        email: response.email,
+        username: response.id
+      })
+    }).catch(error => {
+      console.log(error)
+      this.setState({
+        username: 'error'
+      })
     })
   }
   
@@ -49,7 +60,7 @@ export default class StickerGenerator extends Component {
     })
   }
 
-  emailQRSticker = async (carId) => {
+  handleSubmit = async (carId) => {
     this.setState({
       loading: true,
       hideError: true,
@@ -59,13 +70,19 @@ export default class StickerGenerator extends Component {
 
     const accessToken = await AsyncStorage.getItem('accessToken');
 
-    emailQRSticker(username, carId, email, accessToken).then((response) => {
+    emailQRSticker(username, carId, email, accessToken).then(response => {
+      return response.blob()
+    }).then((blob) => {
+      const fileReaderInstance = new FileReader();
+      fileReaderInstance.readAsDataURL(blob); 
+      fileReaderInstance.onload = () => {
+          base64data = fileReaderInstance.result;                
+          this.setState({
+            stickerURI: base64data
+          })  
+      }
       this.setState({
-        stickerURI: Buffer.from(response.data, 'binary').toString('base64'),
-      }, () => {
-        this.setState({
-          loading: false
-        })
+        loading: false
       })
     }).catch((error) => {
       if (error.status === '400') {
@@ -75,13 +92,14 @@ export default class StickerGenerator extends Component {
           errorMessage: 'Could not find a car with that ID'
         })
       }
-      else {
+      else if (error.status >= '401') {
         this.refreshAuth()
         this.setState({
           loading: false,
           hideError: false,
           errorMessage: 'An error occured. Please try again.'
         })
+        console.log(error)
       }
     })
   }
@@ -91,7 +109,7 @@ export default class StickerGenerator extends Component {
 
     return (
       <ThemeProvider theme={theme}>
-        <Navbar username={username} />
+        <Navbar username={username} navigation={this.props.navigation} />
         <View style={styles.container}>
           <Card title='The Autoground Sticker Generator'>
             <Input 
@@ -102,7 +120,7 @@ export default class StickerGenerator extends Component {
             <Button
               title={loading ? 'Generating PNG...' : 'Generate PNG'}
               onPress={() => {
-                this.emailQRSticker(carId).then((response) => {
+                this.handleSubmit(carId).then(() => {
                   this.setState({
                     overlayVisible: true,
                   })
@@ -128,17 +146,16 @@ export default class StickerGenerator extends Component {
           >
             <View>
               <Text>PNG generated and sent as an email.</Text>
-              <Image
-                style={{
-                  width: 51,
-                  height: 51,
-                  resizeMode: 'contain',
-                }}
-                source={{
-                  uri:
-                    'data:image/png;base64,' + stickerURI,
-                }}
-              />
+              <View>
+                <Image
+                  style={{
+                    width: 300,
+                    height: 150,
+                    resizeMode: 'contain',
+                  }}
+                  source={{ uri: stickerURI }}
+                />
+              </View>
             </View>
           </Overlay>
         </View>

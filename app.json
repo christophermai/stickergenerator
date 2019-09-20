@@ -11,7 +11,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/assets/Logo_Gold.png",
+    "icon": "./app/assets/doge.png",
     "splash": {
       "image": "./app/assets/splash.png",
       "resizeMode": "contain",
@@ -29,7 +29,11 @@
         "NSAppTransportSecurity" : {
           "NSAllowsArbitraryLoads" : true
         }
-      }
+      },
+      "bundleIdentifier": "tag.sticker.generator"
+    },
+    "android": {
+      "package": "tag.sticker.generator"
     }
   }
 }
