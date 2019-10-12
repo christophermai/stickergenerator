@@ -12,6 +12,7 @@ export default class EventInput extends Component {
     carIds: [],
     stickerURIs: [],
     checked: {},
+    checkedSelectAll: false,
     carListVisible: false,
     overlayVisible: false,
     loading: false,
@@ -34,6 +35,17 @@ export default class EventInput extends Component {
     })
   }
 
+  handleSelectAll = (carIds) => {
+    let updatedChecklist = {}
+    for (carId of carIds) {
+      updatedChecklist[carId] = !this.state.checkedSelectAll
+    }
+    this.setState({
+      checked: updatedChecklist,
+      checkedSelectAll: !this.state.checkedSelectAll
+    })
+  }
+
   handleSubmitEventId = async (eventId) => {
     this.setState({
       loading: true,
@@ -41,7 +53,7 @@ export default class EventInput extends Component {
       errorMessage: '',
     })
 
-    var carIds = []
+    let carIds = []
     const { username } = this.props
     const accessToken = await AsyncStorage.getItem('accessToken');
 
@@ -97,7 +109,7 @@ export default class EventInput extends Component {
               let newStickerURIs = stickerURIs
               newStickerURIs.push(base64data)                
               this.setState({
-                stickerURI: newStickerURIs
+                stickerURI: newStickerURIs,
               })
           }
         }).catch((error) => {
@@ -114,7 +126,7 @@ export default class EventInput extends Component {
   }
 
   render () {
-    const { eventId, carIds, stickerURIs, checked, carListVisible, overlayVisible, loading, loadingGenerate, hideError, hideErrorGenerate, errorMessage } = this.state
+    const { eventId, carIds, stickerURIs, checked, checkedSelectAll, carListVisible, overlayVisible, loading, loadingGenerate, hideError, hideErrorGenerate, errorMessage } = this.state
 
     return (
       <React.Fragment>
@@ -148,6 +160,11 @@ export default class EventInput extends Component {
             <View>
               { carIds ?
                 <View>
+                  <CheckBox
+                    title={'Select All'}
+                    checked={checkedSelectAll}
+                    onPress={() => this.handleSelectAll(carIds)}
+                  />
                   { carIds.map((item) => {
                       return (
                         <CheckBox
@@ -182,7 +199,13 @@ export default class EventInput extends Component {
                     overlayBackgroundColor='white'
                     width="auto"
                     height="auto"
-                    onBackdropPress={() => this.setState({ overlayVisible: false, eventId: '' })}
+                    onBackdropPress={() => this.setState({
+                        overlayVisible: false,
+                        eventId: '',
+                        stickerURIs: [],
+                        checked: {}
+                      })
+                    }
                   >
                     <View>
                       <Text>Stickers generated and sent as an email.</Text>

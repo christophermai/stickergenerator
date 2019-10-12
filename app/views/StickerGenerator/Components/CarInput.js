@@ -103,7 +103,11 @@ export default class CarInput extends Component {
           overlayBackgroundColor='white'
           width="auto"
           height="auto"
-          onBackdropPress={() => this.setState({ overlayVisible: false, carId: '' })}
+          onBackdropPress={() => this.setState({
+              overlayVisible: false,
+              carId: ''
+            })
+          }
         >
           <View>
             <Text>PNG generated and sent as an email.</Text>
