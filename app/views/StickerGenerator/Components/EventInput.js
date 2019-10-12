@@ -11,7 +11,7 @@ export default class EventInput extends Component {
     eventId: '',
     carIds: [],
     stickerURIs: [],
-    checked: {},
+    checkedList: {},
     checkedSelectAll: false,
     carListVisible: false,
     overlayVisible: false,
@@ -28,20 +28,20 @@ export default class EventInput extends Component {
     })
   }
 
-  handleCheckbox = (item, checked) => {
-    let updatedChecklist = Object.assign({}, this.state.checked, {[item]: !checked})
+  handleCheckbox = (item, itemChecked) => {
+    let updatedCheckedList = Object.assign({}, this.state.checkedList, {[item]: !itemChecked})
     this.setState({
-      checked: updatedChecklist
+      checkedList: updatedCheckedList
     })
   }
 
   handleSelectAll = (carIds) => {
-    let updatedChecklist = {}
+    let updatedCheckedList = {}
     for (carId of carIds) {
-      updatedChecklist[carId] = !this.state.checkedSelectAll
+      updatedCheckedList[carId] = !this.state.checkedSelectAll
     }
     this.setState({
-      checked: updatedChecklist,
+      checkedList: updatedCheckedList,
       checkedSelectAll: !this.state.checkedSelectAll
     })
   }
@@ -86,7 +86,7 @@ export default class EventInput extends Component {
 
   }
 
-  handleSubmitCarIds = async (checked) => {
+  handleSubmitCarIds = async (checkedList) => {
     this.setState({
       loadingGenerate: true,
       hideErrorGenerate: true,
@@ -97,8 +97,8 @@ export default class EventInput extends Component {
     const { username, email } = this.props
     const accessToken = await AsyncStorage.getItem('accessToken');
 
-    for (let carId of Object.keys(checked)) {
-      if (checked[carId]) {
+    for (let carId of Object.keys(checkedList)) {
+      if (checkedList[carId]) {
         emailQRSticker(username, carId, email, accessToken).then(response => {
           return response.blob()
         }).then((blob) => {
@@ -126,7 +126,7 @@ export default class EventInput extends Component {
   }
 
   render () {
-    const { eventId, carIds, stickerURIs, checked, checkedSelectAll, carListVisible, overlayVisible, loading, loadingGenerate, hideError, hideErrorGenerate, errorMessage } = this.state
+    const { eventId, carIds, stickerURIs, checkedList, checkedSelectAll, carListVisible, overlayVisible, loading, loadingGenerate, hideError, hideErrorGenerate, errorMessage } = this.state
 
     return (
       <React.Fragment>
@@ -170,8 +170,8 @@ export default class EventInput extends Component {
                         <CheckBox
                           title={item}
                           key={item}
-                          checked={checked[item]}
-                          onPress={() => this.handleCheckbox(item, checked[item])}
+                          checked={checkedList[item]}
+                          onPress={() => this.handleCheckbox(item, checkedList[item])}
                         />
                       )
                     })
@@ -179,7 +179,7 @@ export default class EventInput extends Component {
                   <Button
                     title={'Generate Stickers'}
                     onPress={() => {
-                      this.handleSubmitCarIds(checked).then(() => {
+                      this.handleSubmitCarIds(checkedList).then(() => {
                         this.setState({
                           loadingGenerate: false,
                           overlayVisible: true,
@@ -203,7 +203,7 @@ export default class EventInput extends Component {
                         overlayVisible: false,
                         eventId: '',
                         stickerURIs: [],
-                        checked: {}
+                        checkedList: {}
                       })
                     }
                   >
