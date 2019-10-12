@@ -9,7 +9,7 @@ import styles from '../../styles.js'
 export default class EventInput extends Component {
   state = {
     eventId: '',
-    carIds: [],
+    carIds: {},
     stickerURIs: [],
     checkedList: {},
     checkedSelectAll: false,
@@ -53,16 +53,12 @@ export default class EventInput extends Component {
       errorMessage: '',
     })
 
-    let carIds = []
     const { username } = this.props
     const accessToken = await AsyncStorage.getItem('accessToken');
 
     return getEvent(username, eventId, accessToken).then(response => response.json()).then((response) => {
-      for (let carId of Object.keys(response.carRegistrations)) {
-        carIds.push(carId)
-      }
       this.setState({
-        carIds: carIds,
+        carIds: response.carRegistrations,
         loading: false
       })
     }).catch((error) => {
@@ -163,12 +159,12 @@ export default class EventInput extends Component {
                   <CheckBox
                     title={'Select All'}
                     checked={checkedSelectAll}
-                    onPress={() => this.handleSelectAll(carIds)}
+                    onPress={() => this.handleSelectAll(Object.keys(carIds))}
                   />
-                  { carIds.map((item) => {
+                  { Object.keys(carIds).map((item) => {
                       return (
                         <CheckBox
-                          title={item}
+                          title={carIds[item].userId + ' ' + carIds[item].year + ' ' + carIds[item].make + ' ' + carIds[item].model + ': ' + item}
                           key={item}
                           checked={checkedList[item]}
                           onPress={() => this.handleCheckbox(item, checkedList[item])}
