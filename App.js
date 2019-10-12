@@ -3,7 +3,7 @@ import { AppRegistry } from 'react-native'
 import { createSwitchNavigator, createAppContainer } from 'react-navigation'
 
 import Login from './app/views/Login.js'
-import StickerGenerator from './app/views/StickerGenerator.js'
+import StickerGenerator from './app/views/StickerGenerator/StickerGenerator.js'
 import AuthChecker from './app/utils/AuthChecker.js'
 
 

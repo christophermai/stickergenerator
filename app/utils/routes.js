@@ -39,3 +39,13 @@ export const emailQRSticker = (username, carId, email, accessToken) => {
     }
   })
 }
+
+export const getEvent = (username, eventId, accessToken) => {
+  return fetch(`${theAutoGroundApiUrl}/api/event/id/${username}/${eventId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  })
+}
