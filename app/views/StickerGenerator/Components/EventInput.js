@@ -70,13 +70,13 @@ export default class EventInput extends Component {
         })
       }
       else {
+        console.log(error)
         this.props.refreshAuth()
         this.setState({
           loading: false,
           hideError: false,
           errorMessage: 'An error occured. Please try again.'
         })
-        console.log(error)
       }
     })
 

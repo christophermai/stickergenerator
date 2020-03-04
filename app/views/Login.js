@@ -41,9 +41,6 @@ export default class Login extends Component {
 
     return login(data).then(response => response.json()).then((response) => {
       this._signInAsync(response.access_token, response.refresh_token)
-      this.setState({
-        loading: false
-      })
     }).catch((error) => {
       this.setState({
         loading: false,
